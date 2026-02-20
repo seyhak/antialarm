@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import com.antialarm.data.model.Alarm
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
@@ -12,9 +11,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AlarmSchedulerImpl @Inject constructor(
-    @ApplicationContext private val context: Context
-) : AlarmScheduler {
+class AlarmSchedulerImpl @Inject constructor(@ApplicationContext private val context: Context) :
+        AlarmScheduler {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -22,60 +20,68 @@ class AlarmSchedulerImpl @Inject constructor(
         val triggerTime = calculateNextTriggerTime(alarm)
         val pendingIntent = createPendingIntent(alarm)
 
-        val alarmClockInfo = AlarmManager.AlarmClockInfo(
-            triggerTime,
-            createShowIntent(alarm)
-        )
+        val alarmClockInfo = AlarmManager.AlarmClockInfo(triggerTime, createShowIntent(alarm))
 
         alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
     }
 
     override fun cancel(alarmId: Int) {
-        val intent = Intent(context, AlarmReceiver::class.java).apply {
-            action = AlarmReceiver.ACTION_ALARM_FIRED
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            alarmId,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val intent =
+                Intent(context, AlarmReceiver::class.java).apply {
+                    action = AlarmReceiver.ACTION_ALARM_FIRED
+                }
+        val pendingIntent =
+                PendingIntent.getBroadcast(
+                        context,
+                        alarmId,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
     }
 
     private fun createPendingIntent(alarm: Alarm): PendingIntent {
-        val intent = Intent(context, AlarmReceiver::class.java).apply {
-            action = AlarmReceiver.ACTION_ALARM_FIRED
-            putExtra(AlarmReceiver.EXTRA_ALARM_ID, alarm.id)
-        }
+        val intent =
+                Intent(context, AlarmReceiver::class.java).apply {
+                    action = AlarmReceiver.ACTION_ALARM_FIRED
+                    putExtra(AlarmReceiver.EXTRA_ALARM_ID, alarm.id)
+                    putExtra(AlarmReceiver.EXTRA_ALARM_LABEL, alarm.label)
+                    putExtra(AlarmReceiver.EXTRA_ALARM_HOUR, alarm.hour)
+                    putExtra(AlarmReceiver.EXTRA_ALARM_MINUTE, alarm.minute)
+                    putExtra(AlarmReceiver.EXTRA_MATH_DIFFICULTY, alarm.mathDifficulty)
+                    putExtra(AlarmReceiver.EXTRA_SNOOZE_MINUTES, alarm.snoozeMinutes)
+                    putExtra(AlarmReceiver.EXTRA_VIBRATE, alarm.vibrate)
+                    putExtra(AlarmReceiver.EXTRA_SOUND_URI, alarm.soundUri)
+                }
         return PendingIntent.getBroadcast(
-            context,
-            alarm.id,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                context,
+                alarm.id,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
     private fun createShowIntent(alarm: Alarm): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         return PendingIntent.getActivity(
-            context,
-            alarm.id,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                context,
+                alarm.id,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
     companion object {
         fun calculateNextTriggerTime(alarm: Alarm): Long {
             val now = Calendar.getInstance()
-            val trigger = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, alarm.hour)
-                set(Calendar.MINUTE, alarm.minute)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
+            val trigger =
+                    Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, alarm.hour)
+                        set(Calendar.MINUTE, alarm.minute)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
 
             if (alarm.isOneTime) {
                 // If time already passed today, schedule for tomorrow
@@ -87,16 +93,18 @@ class AlarmSchedulerImpl @Inject constructor(
 
             // Repeating alarm — find next matching day
             // Calendar: SUNDAY=1, MONDAY=2, ..., SATURDAY=7
-            // Our bitmask: Mon=1(bit0), Tue=2(bit1), Wed=4(bit2), Thu=8(bit3), Fri=16(bit4), Sat=32(bit5), Sun=64(bit6)
-            val calDayToFlag = mapOf(
-                Calendar.MONDAY to Alarm.MONDAY,
-                Calendar.TUESDAY to Alarm.TUESDAY,
-                Calendar.WEDNESDAY to Alarm.WEDNESDAY,
-                Calendar.THURSDAY to Alarm.THURSDAY,
-                Calendar.FRIDAY to Alarm.FRIDAY,
-                Calendar.SATURDAY to Alarm.SATURDAY,
-                Calendar.SUNDAY to Alarm.SUNDAY
-            )
+            // Our bitmask: Mon=1(bit0), Tue=2(bit1), Wed=4(bit2), Thu=8(bit3), Fri=16(bit4),
+            // Sat=32(bit5), Sun=64(bit6)
+            val calDayToFlag =
+                    mapOf(
+                            Calendar.MONDAY to Alarm.MONDAY,
+                            Calendar.TUESDAY to Alarm.TUESDAY,
+                            Calendar.WEDNESDAY to Alarm.WEDNESDAY,
+                            Calendar.THURSDAY to Alarm.THURSDAY,
+                            Calendar.FRIDAY to Alarm.FRIDAY,
+                            Calendar.SATURDAY to Alarm.SATURDAY,
+                            Calendar.SUNDAY to Alarm.SUNDAY
+                    )
 
             // Check today first (only if time hasn't passed)
             if (trigger.timeInMillis > now.timeInMillis) {
