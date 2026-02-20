@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.antialarm.ui.theme.AccentOrange
 import com.antialarm.ui.theme.AccentRed
 import com.antialarm.ui.theme.DarkSurface
 import com.antialarm.ui.theme.TextSecondary
@@ -124,7 +123,9 @@ fun AlarmFiringScreen(
                                     Modifier.size(120.dp)
                                             .scale(pulseScale)
                                             .background(
-                                                    AccentOrange.copy(alpha = 0.15f),
+                                                    MaterialTheme.colorScheme.primary.copy(
+                                                            alpha = 0.15f
+                                                    ),
                                                     CircleShape
                                             ),
                             contentAlignment = Alignment.Center
@@ -133,7 +134,7 @@ fun AlarmFiringScreen(
                                 Icons.Default.Alarm,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = AccentOrange
+                                tint = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -163,7 +164,7 @@ fun AlarmFiringScreen(
                     Text(
                             text = "Set for ${String.format("%02d:%02d", alarmHour, alarmMinute)}",
                             style = MaterialTheme.typography.titleMedium,
-                            color = AccentOrange.copy(alpha = 0.8f),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
                             fontWeight = FontWeight.Medium
                     )
 
@@ -180,7 +181,10 @@ fun AlarmFiringScreen(
                             },
                             modifier = Modifier.fillMaxWidth().height(64.dp),
                             shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = AccentOrange)
+                            colors =
+                                    ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                    )
                     ) {
                         Text(
                                 "Dismiss",

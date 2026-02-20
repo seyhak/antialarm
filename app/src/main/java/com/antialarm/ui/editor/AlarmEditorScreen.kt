@@ -1,6 +1,5 @@
 package com.antialarm.ui.editor
 
-import android.media.RingtoneManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -59,18 +57,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antialarm.data.model.Alarm
-import com.antialarm.ui.theme.AccentBlue
 import com.antialarm.ui.theme.AccentGreen
-import com.antialarm.ui.theme.AccentOrange
-import com.antialarm.ui.theme.AccentRed
-import com.antialarm.ui.theme.AccentYellow
 import com.antialarm.ui.theme.DarkCard
 import com.antialarm.ui.theme.DarkCardVariant
 import com.antialarm.ui.theme.TextMuted
@@ -79,88 +72,90 @@ import com.antialarm.ui.theme.TextSecondary
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AlarmEditorScreen(
-    onNavigateBack: () -> Unit,
-    viewModel: AlarmEditorViewModel = hiltViewModel()
+        onNavigateBack: () -> Unit,
+        viewModel: AlarmEditorViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val timePickerState = rememberTimePickerState(
-        initialHour = state.hour,
-        initialMinute = state.minute,
-        is24Hour = true
-    )
+    val timePickerState =
+            rememberTimePickerState(
+                    initialHour = state.hour,
+                    initialMinute = state.minute,
+                    is24Hour = true
+            )
 
     // Audio file picker
-    val audioPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            // Take persistable permission
-            context.contentResolver.takePersistableUriPermission(
-                it, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-            viewModel.updateSoundUri(it.toString(), "Custom audio")
-        }
-    }
+    val audioPickerLauncher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+                    uri ->
+                uri?.let {
+                    // Take persistable permission
+                    context.contentResolver.takePersistableUriPermission(
+                            it,
+                            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                    viewModel.updateSoundUri(it.toString(), "Custom audio")
+                }
+            }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        if (state.isEditing) "Edit Alarm" else "New Alarm",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            viewModel.updateTime(timePickerState.hour, timePickerState.minute)
-                            viewModel.saveAlarm { onNavigateBack() }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = "Save",
-                            tint = AccentGreen
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+            topBar = {
+                TopAppBar(
+                        title = {
+                            Text(
+                                    if (state.isEditing) "Edit Alarm" else "New Alarm",
+                                    fontWeight = FontWeight.Bold
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = onNavigateBack) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        actions = {
+                            IconButton(
+                                    onClick = {
+                                        viewModel.updateTime(
+                                                timePickerState.hour,
+                                                timePickerState.minute
+                                        )
+                                        viewModel.saveAlarm { onNavigateBack() }
+                                    }
+                            ) {
+                                Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = "Save",
+                                        tint = AccentGreen
+                                )
+                            }
+                        },
+                        colors =
+                                TopAppBarDefaults.topAppBarColors(
+                                        containerColor = MaterialTheme.colorScheme.background,
+                                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                                )
                 )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
+            },
+            containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
+                modifier =
+                        Modifier.fillMaxSize()
+                                .padding(padding)
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 16.dp)
         ) {
             // Time Picker
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkCard)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = DarkCard)
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    TimePicker(state = timePickerState)
-                }
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        contentAlignment = Alignment.Center
+                ) { TimePicker(state = timePickerState) }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -168,18 +163,19 @@ fun AlarmEditorScreen(
             // Label
             SectionTitle("Label")
             OutlinedTextField(
-                value = state.label,
-                onValueChange = { viewModel.updateLabel(it) },
-                placeholder = { Text("Alarm label", color = TextMuted) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = AccentOrange,
-                    unfocusedBorderColor = DarkCardVariant,
-                    focusedContainerColor = DarkCard,
-                    unfocusedContainerColor = DarkCard
-                ),
-                singleLine = true
+                    value = state.label,
+                    onValueChange = { viewModel.updateLabel(it) },
+                    placeholder = { Text("Alarm label", color = TextMuted) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors =
+                            OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = DarkCardVariant,
+                                    focusedContainerColor = DarkCard,
+                                    unfocusedContainerColor = DarkCard
+                            ),
+                    singleLine = true
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -187,27 +183,32 @@ fun AlarmEditorScreen(
             // Repeat Days
             SectionTitle("Repeat")
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Alarm.DAY_FLAGS.zip(Alarm.DAY_NAMES).forEach { (flag, name) ->
                     val selected = state.repeatDays and flag != 0
                     FilterChip(
-                        selected = selected,
-                        onClick = { viewModel.toggleDay(flag) },
-                        label = { Text(name) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = AccentOrange.copy(alpha = 0.2f),
-                            selectedLabelColor = AccentOrange,
-                            containerColor = DarkCard,
-                            labelColor = TextSecondary
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            borderColor = DarkCardVariant,
-                            selectedBorderColor = AccentOrange,
-                            enabled = true,
-                            selected = selected
-                        )
+                            selected = selected,
+                            onClick = { viewModel.toggleDay(flag) },
+                            label = { Text(name) },
+                            colors =
+                                    FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor =
+                                                    MaterialTheme.colorScheme.primary.copy(
+                                                            alpha = 0.2f
+                                                    ),
+                                            selectedLabelColor = MaterialTheme.colorScheme.primary,
+                                            containerColor = DarkCard,
+                                            labelColor = TextSecondary
+                                    ),
+                            border =
+                                    FilterChipDefaults.filterChipBorder(
+                                            borderColor = DarkCardVariant,
+                                            selectedBorderColor = MaterialTheme.colorScheme.primary,
+                                            enabled = true,
+                                            selected = selected
+                                    )
                     )
                 }
             }
@@ -217,47 +218,45 @@ fun AlarmEditorScreen(
             // Alarm Sound
             SectionTitle("Alarm Sound")
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        audioPickerLauncher.launch(arrayOf("audio/*"))
-                    },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkCard)
+                    modifier =
+                            Modifier.fillMaxWidth().clickable {
+                                audioPickerLauncher.launch(arrayOf("audio/*"))
+                            },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = DarkCard)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        Icons.Default.MusicNote,
-                        contentDescription = null,
-                        tint = AccentBlue,
-                        modifier = Modifier.size(24.dp)
+                            Icons.Default.MusicNote,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            state.soundName,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
+                                state.soundName,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            "Tap to change",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TextMuted
+                                "Tap to change",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextMuted
                         )
                     }
                     if (state.soundUri != null) {
                         Text(
-                            "Reset",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = AccentOrange,
-                            modifier = Modifier.clickable {
-                                viewModel.updateSoundUri(null, "Default")
-                            }
+                                "Reset",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier =
+                                        Modifier.clickable {
+                                            viewModel.updateSoundUri(null, "Default")
+                                        }
                         )
                     }
                 }
@@ -271,21 +270,24 @@ fun AlarmEditorScreen(
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                 difficulties.forEachIndexed { index, label ->
                     SegmentedButton(
-                        selected = state.mathDifficulty == index,
-                        onClick = { viewModel.updateMathDifficulty(index) },
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index = index,
-                            count = difficulties.size
-                        ),
-                        colors = SegmentedButtonDefaults.colors(
-                            activeContainerColor = AccentOrange.copy(alpha = 0.2f),
-                            activeContentColor = AccentOrange,
-                            inactiveContainerColor = DarkCard,
-                            inactiveContentColor = TextSecondary
-                        )
-                    ) {
-                        Text(label)
-                    }
+                            selected = state.mathDifficulty == index,
+                            onClick = { viewModel.updateMathDifficulty(index) },
+                            shape =
+                                    SegmentedButtonDefaults.itemShape(
+                                            index = index,
+                                            count = difficulties.size
+                                    ),
+                            colors =
+                                    SegmentedButtonDefaults.colors(
+                                            activeContainerColor =
+                                                    MaterialTheme.colorScheme.primary.copy(
+                                                            alpha = 0.2f
+                                                    ),
+                                            activeContentColor = MaterialTheme.colorScheme.primary,
+                                            inactiveContainerColor = DarkCard,
+                                            inactiveContentColor = TextSecondary
+                                    )
+                    ) { Text(label) }
                 }
             }
 
@@ -297,40 +299,33 @@ fun AlarmEditorScreen(
             val snoozeOptions = listOf(1, 3, 5, 10, 15, 20, 30)
 
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { snoozeExpanded = true },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkCard)
+                    modifier = Modifier.fillMaxWidth().clickable { snoozeExpanded = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = DarkCard)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "${state.snoozeMinutes} minutes",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
+                            "${state.snoozeMinutes} minutes",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f)
                     )
-                    Text(
-                        "▼",
-                        color = TextMuted
-                    )
+                    Text("▼", color = TextMuted)
 
                     DropdownMenu(
-                        expanded = snoozeExpanded,
-                        onDismissRequest = { snoozeExpanded = false }
+                            expanded = snoozeExpanded,
+                            onDismissRequest = { snoozeExpanded = false }
                     ) {
                         snoozeOptions.forEach { minutes ->
                             DropdownMenuItem(
-                                text = { Text("$minutes minutes") },
-                                onClick = {
-                                    viewModel.updateSnoozeMinutes(minutes)
-                                    snoozeExpanded = false
-                                }
+                                    text = { Text("$minutes minutes") },
+                                    onClick = {
+                                        viewModel.updateSnoozeMinutes(minutes)
+                                        snoozeExpanded = false
+                                    }
                             )
                         }
                     }
@@ -341,31 +336,33 @@ fun AlarmEditorScreen(
 
             // Vibrate
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkCard)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = DarkCard)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Vibrate",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
+                            "Vibrate",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f)
                     )
                     Switch(
-                        checked = state.vibrate,
-                        onCheckedChange = { viewModel.updateVibrate(it) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = AccentOrange,
-                            checkedTrackColor = AccentOrange.copy(alpha = 0.3f),
-                            uncheckedThumbColor = TextMuted,
-                            uncheckedTrackColor = DarkCardVariant
-                        )
+                            checked = state.vibrate,
+                            onCheckedChange = { viewModel.updateVibrate(it) },
+                            colors =
+                                    SwitchDefaults.colors(
+                                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                            checkedTrackColor =
+                                                    MaterialTheme.colorScheme.primary.copy(
+                                                            alpha = 0.3f
+                                                    ),
+                                            uncheckedThumbColor = TextMuted,
+                                            uncheckedTrackColor = DarkCardVariant
+                                    )
                     )
                 }
             }
@@ -374,23 +371,22 @@ fun AlarmEditorScreen(
 
             // Save Button
             Button(
-                onClick = {
-                    viewModel.updateTime(timePickerState.hour, timePickerState.minute)
-                    viewModel.saveAlarm { onNavigateBack() }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AccentOrange
-                ),
-                enabled = !state.isSaving
+                    onClick = {
+                        viewModel.updateTime(timePickerState.hour, timePickerState.minute)
+                        viewModel.saveAlarm { onNavigateBack() }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors =
+                            ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                    enabled = !state.isSaving
             ) {
                 Text(
-                    if (state.isEditing) "Update Alarm" else "Create Alarm",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                        if (state.isEditing) "Update Alarm" else "Create Alarm",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                 )
             }
 
@@ -402,9 +398,9 @@ fun AlarmEditorScreen(
 @Composable
 private fun SectionTitle(title: String) {
     Text(
-        text = title,
-        style = MaterialTheme.typography.labelLarge,
-        color = AccentOrange,
-        modifier = Modifier.padding(bottom = 8.dp)
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp)
     )
 }
