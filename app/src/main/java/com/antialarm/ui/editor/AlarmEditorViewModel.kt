@@ -6,31 +6,32 @@ import androidx.lifecycle.viewModelScope
 import com.antialarm.data.model.Alarm
 import com.antialarm.data.repository.AlarmRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class AlarmEditorState(
-    val hour: Int = 8,
-    val minute: Int = 0,
-    val label: String = "",
-    val repeatDays: Int = 0,
-    val soundUri: String? = null,
-    val soundName: String = "Default",
-    val mathDifficulty: Int = 1,
-    val snoozeMinutes: Int = 5,
-    val vibrate: Boolean = true,
-    val isEditing: Boolean = false,
-    val isSaving: Boolean = false
+        val hour: Int = 8,
+        val minute: Int = 0,
+        val label: String = "",
+        val repeatDays: Int = 0,
+        val soundUri: String? = null,
+        val soundName: String = "Default",
+        val mathDifficulty: Int = 1,
+        val snoozeMinutes: Int = 5,
+        val vibrate: Boolean = true,
+        val isEditing: Boolean = false,
+        val isSaving: Boolean = false,
+        val isLoaded: Boolean = false
 )
 
 @HiltViewModel
-class AlarmEditorViewModel @Inject constructor(
-    private val repository: AlarmRepository,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
+class AlarmEditorViewModel
+@Inject
+constructor(private val repository: AlarmRepository, savedStateHandle: SavedStateHandle) :
+        ViewModel() {
 
     private val alarmId: Int = savedStateHandle.get<Int>("alarmId") ?: -1
 
@@ -44,20 +45,25 @@ class AlarmEditorViewModel @Inject constructor(
             viewModelScope.launch {
                 repository.getAlarmById(alarmId)?.let { alarm ->
                     existingAlarm = alarm
-                    _state.value = AlarmEditorState(
-                        hour = alarm.hour,
-                        minute = alarm.minute,
-                        label = alarm.label,
-                        repeatDays = alarm.repeatDays,
-                        soundUri = alarm.soundUri,
-                        soundName = if (alarm.soundUri != null) "Custom" else "Default",
-                        mathDifficulty = alarm.mathDifficulty,
-                        snoozeMinutes = alarm.snoozeMinutes,
-                        vibrate = alarm.vibrate,
-                        isEditing = true
-                    )
+                    _state.value =
+                            AlarmEditorState(
+                                    hour = alarm.hour,
+                                    minute = alarm.minute,
+                                    label = alarm.label,
+                                    repeatDays = alarm.repeatDays,
+                                    soundUri = alarm.soundUri,
+                                    soundName = if (alarm.soundUri != null) "Custom" else "Default",
+                                    mathDifficulty = alarm.mathDifficulty,
+                                    snoozeMinutes = alarm.snoozeMinutes,
+                                    vibrate = alarm.vibrate,
+                                    isEditing = true,
+                                    isLoaded = true
+                            )
                 }
+                        ?: run { _state.value = _state.value.copy(isLoaded = true) }
             }
+        } else {
+            _state.value = _state.value.copy(isLoaded = true)
         }
     }
 
@@ -95,18 +101,19 @@ class AlarmEditorViewModel @Inject constructor(
         _state.value = _state.value.copy(isSaving = true)
         viewModelScope.launch {
             val s = _state.value
-            val alarm = Alarm(
-                id = existingAlarm?.id ?: 0,
-                hour = s.hour,
-                minute = s.minute,
-                label = s.label,
-                isEnabled = true,
-                soundUri = s.soundUri,
-                repeatDays = s.repeatDays,
-                mathDifficulty = s.mathDifficulty,
-                snoozeMinutes = s.snoozeMinutes,
-                vibrate = s.vibrate
-            )
+            val alarm =
+                    Alarm(
+                            id = existingAlarm?.id ?: 0,
+                            hour = s.hour,
+                            minute = s.minute,
+                            label = s.label,
+                            isEnabled = true,
+                            soundUri = s.soundUri,
+                            repeatDays = s.repeatDays,
+                            mathDifficulty = s.mathDifficulty,
+                            snoozeMinutes = s.snoozeMinutes,
+                            vibrate = s.vibrate
+                    )
             repository.saveAlarm(alarm)
             onComplete()
         }

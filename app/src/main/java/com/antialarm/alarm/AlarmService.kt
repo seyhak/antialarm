@@ -46,11 +46,11 @@ class AlarmService : Service() {
 
     private fun setupMediaSession() {
         mediaSession =
-                MediaSession(this, "AntiAlarmMediaSession").apply {
+                MediaSession(this, "AlarmMathlyMediaSession").apply {
                     setMetadata(
                             MediaMetadata.Builder()
                                     .putString(MediaMetadata.METADATA_KEY_TITLE, "Alarm")
-                                    .putString(MediaMetadata.METADATA_KEY_ARTIST, "AntiAlarm")
+                                    .putString(MediaMetadata.METADATA_KEY_ARTIST, "Alarm Mathly")
                                     .build()
                     )
                     isActive = true

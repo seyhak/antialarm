@@ -59,7 +59,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antialarm.data.model.Alarm
-import com.antialarm.ui.theme.AccentOrange
 import com.antialarm.ui.theme.AccentRed
 import com.antialarm.ui.theme.DarkCard
 import com.antialarm.ui.theme.DarkCardVariant
@@ -75,110 +74,129 @@ fun AlarmListScreen(
         onEditAlarm: (Int) -> Unit,
         viewModel: AlarmListViewModel = hiltViewModel()
 ) {
-    val alarms by viewModel.alarms.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    var currentTimeMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+        val alarms by viewModel.alarms.collectAsStateWithLifecycle()
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+        var currentTimeMillis by remember { mutableStateOf(System.currentTimeMillis()) }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentTimeMillis = System.currentTimeMillis()
-            delay(60000) // Update every minute
-        }
-    }
-
-    Scaffold(
-            topBar = {
-                TopAppBar(
-                        title = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                        Icons.Default.Alarm,
-                                        contentDescription = null,
-                                        tint = AccentOrange,
-                                        modifier = Modifier.size(28.dp)
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text("AntiAlarm", fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                            }
-                        },
-                        colors =
-                                TopAppBarDefaults.topAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.background,
-                                        titleContentColor = MaterialTheme.colorScheme.onBackground
-                                )
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                        onClick = onAddAlarm,
-                        containerColor = AccentOrange,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                ) { Icon(Icons.Default.Add, contentDescription = "Add alarm") }
-            },
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-            containerColor = MaterialTheme.colorScheme.background
-    ) { padding ->
-        if (alarms.isEmpty()) {
-            Box(
-                    modifier = Modifier.fillMaxSize().padding(padding),
-                    contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                            Icons.Default.Alarm,
-                            contentDescription = null,
-                            modifier = Modifier.size(80.dp),
-                            tint = TextMuted
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                            "No alarms yet",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = TextSecondary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                            "Tap + to create your first alarm",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
-                    )
+        LaunchedEffect(Unit) {
+                while (true) {
+                        currentTimeMillis = System.currentTimeMillis()
+                        delay(60000) // Update every minute
                 }
-            }
-        } else {
-            LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                item { Spacer(modifier = Modifier.height(4.dp)) }
+        }
 
-                items(alarms, key = { it.id }) { alarm ->
-                    SwipeToDeleteAlarmItem(
-                            alarm = alarm,
-                            currentTimeMillis = currentTimeMillis,
-                            onToggle = { enabled -> viewModel.toggleAlarm(alarm.id, enabled) },
-                            onClick = { onEditAlarm(alarm.id) },
-                            onDelete = {
-                                viewModel.deleteAlarm(alarm)
-                                scope.launch {
-                                    val result =
-                                            snackbarHostState.showSnackbar(
-                                                    message = "Alarm deleted",
-                                                    actionLabel = "Undo",
-                                                    duration = SnackbarDuration.Short
-                                            )
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        viewModel.undoDelete()
-                                    }
+        Scaffold(
+                topBar = {
+                        TopAppBar(
+                                title = {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                        Icons.Default.Alarm,
+                                                        contentDescription = null,
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                        modifier = Modifier.size(28.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(12.dp))
+                                                Text(
+                                                        "Alarm Mathly",
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 24.sp
+                                                )
+                                        }
+                                },
+                                colors =
+                                        TopAppBarDefaults.topAppBarColors(
+                                                containerColor =
+                                                        MaterialTheme.colorScheme.background,
+                                                titleContentColor =
+                                                        MaterialTheme.colorScheme.onBackground
+                                        )
+                        )
+                },
+                floatingActionButton = {
+                        FloatingActionButton(
+                                onClick = onAddAlarm,
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                        ) { Icon(Icons.Default.Add, contentDescription = "Add alarm") }
+                },
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                containerColor = MaterialTheme.colorScheme.background
+        ) { padding ->
+                if (alarms.isEmpty()) {
+                        Box(
+                                modifier = Modifier.fillMaxSize().padding(padding),
+                                contentAlignment = Alignment.Center
+                        ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                                Icons.Default.Alarm,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(80.dp),
+                                                tint = TextMuted
+                                        )
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        Text(
+                                                "No alarms yet",
+                                                style = MaterialTheme.typography.titleLarge,
+                                                color = TextSecondary
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                                "Tap + to create your first alarm",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = TextMuted
+                                        )
                                 }
-                            }
-                    )
-                }
+                        }
+                } else {
+                        LazyColumn(
+                                modifier =
+                                        Modifier.fillMaxSize()
+                                                .padding(padding)
+                                                .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                                item { Spacer(modifier = Modifier.height(4.dp)) }
 
-                item { Spacer(modifier = Modifier.height(80.dp)) }
-            }
+                                items(alarms, key = { it.id }) { alarm ->
+                                        SwipeToDeleteAlarmItem(
+                                                alarm = alarm,
+                                                currentTimeMillis = currentTimeMillis,
+                                                onToggle = { enabled ->
+                                                        viewModel.toggleAlarm(alarm.id, enabled)
+                                                },
+                                                onClick = { onEditAlarm(alarm.id) },
+                                                onDelete = {
+                                                        viewModel.deleteAlarm(alarm)
+                                                        scope.launch {
+                                                                val result =
+                                                                        snackbarHostState
+                                                                                .showSnackbar(
+                                                                                        message =
+                                                                                                "Alarm deleted",
+                                                                                        actionLabel =
+                                                                                                "Undo",
+                                                                                        duration =
+                                                                                                SnackbarDuration
+                                                                                                        .Short
+                                                                                )
+                                                                if (result ==
+                                                                                SnackbarResult
+                                                                                        .ActionPerformed
+                                                                ) {
+                                                                        viewModel.undoDelete()
+                                                                }
+                                                        }
+                                                }
+                                        )
+                                }
+
+                                item { Spacer(modifier = Modifier.height(80.dp)) }
+                        }
+                }
         }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -190,56 +208,56 @@ private fun SwipeToDeleteAlarmItem(
         onClick: () -> Unit,
         onDelete: () -> Unit
 ) {
-    var isRemoved by remember { mutableStateOf(false) }
-    val dismissState =
-            rememberSwipeToDismissBoxState(
-                    confirmValueChange = { value ->
-                        if (value == SwipeToDismissBoxValue.EndToStart) {
-                            isRemoved = true
-                            true
-                        } else false
-                    }
-            )
+        var isRemoved by remember { mutableStateOf(false) }
+        val dismissState =
+                rememberSwipeToDismissBoxState(
+                        confirmValueChange = { value ->
+                                if (value == SwipeToDismissBoxValue.EndToStart) {
+                                        isRemoved = true
+                                        true
+                                } else false
+                        }
+                )
 
-    LaunchedEffect(isRemoved) {
-        if (isRemoved) {
-            delay(300)
-            onDelete()
+        LaunchedEffect(isRemoved) {
+                if (isRemoved) {
+                        delay(300)
+                        onDelete()
+                }
         }
-    }
 
-    AnimatedVisibility(
-            visible = !isRemoved,
-            exit = shrinkVertically(tween(300)) + fadeOut(tween(300))
-    ) {
-        SwipeToDismissBox(
-                state = dismissState,
-                backgroundContent = {
-                    Box(
-                            modifier =
-                                    Modifier.fillMaxSize()
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .background(AccentRed),
-                            contentAlignment = Alignment.CenterEnd
-                    ) {
-                        Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                modifier = Modifier.padding(end = 24.dp),
-                                tint = MaterialTheme.colorScheme.onError
-                        )
-                    }
-                },
-                enableDismissFromStartToEnd = false
+        AnimatedVisibility(
+                visible = !isRemoved,
+                exit = shrinkVertically(tween(300)) + fadeOut(tween(300))
         ) {
-            AlarmCard(
-                    alarm = alarm,
-                    currentTimeMillis = currentTimeMillis,
-                    onToggle = onToggle,
-                    onClick = onClick
-            )
+                SwipeToDismissBox(
+                        state = dismissState,
+                        backgroundContent = {
+                                Box(
+                                        modifier =
+                                                Modifier.fillMaxSize()
+                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .background(AccentRed),
+                                        contentAlignment = Alignment.CenterEnd
+                                ) {
+                                        Icon(
+                                                Icons.Default.Delete,
+                                                contentDescription = "Delete",
+                                                modifier = Modifier.padding(end = 24.dp),
+                                                tint = MaterialTheme.colorScheme.onError
+                                        )
+                                }
+                        },
+                        enableDismissFromStartToEnd = false
+                ) {
+                        AlarmCard(
+                                alarm = alarm,
+                                currentTimeMillis = currentTimeMillis,
+                                onToggle = onToggle,
+                                onClick = onClick
+                        )
+                }
         }
-    }
 }
 
 @Composable
@@ -249,79 +267,92 @@ private fun AlarmCard(
         onToggle: (Boolean) -> Unit,
         onClick: () -> Unit
 ) {
-    Card(
-            modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-            shape = RoundedCornerShape(16.dp),
-            colors =
-                    CardDefaults.cardColors(
-                            containerColor =
-                                    if (alarm.isEnabled) DarkCard
-                                    else DarkCardVariant.copy(alpha = 0.5f)
-                    ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+                shape = RoundedCornerShape(16.dp),
+                colors =
+                        CardDefaults.cardColors(
+                                containerColor =
+                                        if (alarm.isEnabled) DarkCard
+                                        else DarkCardVariant.copy(alpha = 0.5f)
+                        ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                        text = alarm.getTimeString(),
-                        style =
-                                MaterialTheme.typography.displayMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 42.sp
-                                ),
-                        color =
-                                if (alarm.isEnabled) MaterialTheme.colorScheme.onSurface
-                                else TextMuted
-                )
+                Row(
+                        modifier = Modifier.fillMaxWidth().padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                        text = alarm.getTimeString(),
+                                        style =
+                                                MaterialTheme.typography.displayMedium.copy(
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 42.sp
+                                                ),
+                                        color =
+                                                if (alarm.isEnabled)
+                                                        MaterialTheme.colorScheme.onSurface
+                                                else TextMuted
+                                )
 
-                if (alarm.label.isNotBlank()) {
-                    Text(
-                            text = alarm.label,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (alarm.isEnabled) TextSecondary else TextMuted
-                    )
+                                if (alarm.label.isNotBlank()) {
+                                        Text(
+                                                text = alarm.label,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color =
+                                                        if (alarm.isEnabled) TextSecondary
+                                                        else TextMuted
+                                        )
+                                }
+
+                                val timeUntilNext = alarm.getTimeUntilNext(currentTimeMillis)
+                                if (timeUntilNext != null) {
+                                        Text(
+                                                text = timeUntilNext,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color =
+                                                        MaterialTheme.colorScheme.primary.copy(
+                                                                alpha = 0.9f
+                                                        ),
+                                                fontWeight = FontWeight.Medium
+                                        )
+                                }
+
+                                val dayNames = alarm.getEnabledDayNames()
+                                if (dayNames.isNotEmpty()) {
+                                        Text(
+                                                text = dayNames.joinToString(", "),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color =
+                                                        if (alarm.isEnabled)
+                                                                MaterialTheme.colorScheme.primary
+                                                        else TextMuted
+                                        )
+                                } else {
+                                        Text(
+                                                text = "One-time",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = TextMuted
+                                        )
+                                }
+                        }
+
+                        Switch(
+                                checked = alarm.isEnabled,
+                                onCheckedChange = onToggle,
+                                colors =
+                                        SwitchDefaults.colors(
+                                                checkedThumbColor =
+                                                        MaterialTheme.colorScheme.primary,
+                                                checkedTrackColor =
+                                                        MaterialTheme.colorScheme.primary.copy(
+                                                                alpha = 0.3f
+                                                        ),
+                                                uncheckedThumbColor = TextMuted,
+                                                uncheckedTrackColor = DarkCardVariant
+                                        )
+                        )
                 }
-
-                val timeUntilNext = alarm.getTimeUntilNext(currentTimeMillis)
-                if (timeUntilNext != null) {
-                    Text(
-                            text = timeUntilNext,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = AccentOrange.copy(alpha = 0.9f),
-                            fontWeight = FontWeight.Medium
-                    )
-                }
-
-                val dayNames = alarm.getEnabledDayNames()
-                if (dayNames.isNotEmpty()) {
-                    Text(
-                            text = dayNames.joinToString(", "),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (alarm.isEnabled) AccentOrange else TextMuted
-                    )
-                } else {
-                    Text(
-                            text = "One-time",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextMuted
-                    )
-                }
-            }
-
-            Switch(
-                    checked = alarm.isEnabled,
-                    onCheckedChange = onToggle,
-                    colors =
-                            SwitchDefaults.colors(
-                                    checkedThumbColor = AccentOrange,
-                                    checkedTrackColor = AccentOrange.copy(alpha = 0.3f),
-                                    uncheckedThumbColor = TextMuted,
-                                    uncheckedTrackColor = DarkCardVariant
-                            )
-            )
         }
-    }
 }

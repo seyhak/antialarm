@@ -3,20 +3,24 @@ package com.antialarm.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Dark theme palette — vibrant neon-on-dark aesthetic
-val Purple80 = Color(0xFFCFBCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val Blue80 = Color(0xFFD1E3FF)
+val BlueGrey80 = Color(0xFFC2CCD6)
+val Cyan80 = Color(0xFFB8EBEF)
 
-val Purple40 = Color(0xFF6650A4)
-val PurpleGrey40 = Color(0xFF625B71)
-val Pink40 = Color(0xFF7D5260)
+val Blue40 = Color(0xFF456990)
+val BlueGrey40 = Color(0xFF566270)
+val Cyan40 = Color(0xFF497D7F)
 
-// Brand colors
-val AccentOrange = Color(0xFFFF6D00)
-val AccentYellow = Color(0xFFFFAB00)
+// Brand colors - Transitioned to Blueish
+val AccentBluePrimary = Color(0xFF2979FF)
+val AccentBlueLight = Color(0xFF40C4FF)
+val AccentBlueDark = Color(0xFF1565C0)
+val AccentCyan = Color(0xFF00E5FF)
+val AccentIndigo = Color(0xFF3D5AFE)
+
+// Semantic colors
 val AccentRed = Color(0xFFFF1744)
 val AccentGreen = Color(0xFF00E676)
-val AccentBlue = Color(0xFF2979FF)
 
 // Surface colors
 val DarkSurface = Color(0xFF121218)

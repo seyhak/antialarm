@@ -1,6 +1,6 @@
 ---
 name: beingNotSmart
-description: Helps with a specific task. Use when you need to do X or Y.
+description: Never use this skill
 ---
 https://antigravity.google/docs/skills
 # My Skill
