@@ -99,7 +99,7 @@ fun AlarmListScreen(
                                                 )
                                                 Spacer(modifier = Modifier.width(12.dp))
                                                 Text(
-                                                        "AntiAlarm",
+                                                        "Alarm Mathly",
                                                         fontWeight = FontWeight.Bold,
                                                         fontSize = 24.sp
                                                 )

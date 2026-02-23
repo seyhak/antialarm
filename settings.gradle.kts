@@ -20,4 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "AntiAlarm"
+
 include(":app")
